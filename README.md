@@ -1,11 +1,11 @@
 # Agentic Brand Reputation Check 🔍
 
-![web ui](ui/public/brand-reputation-check.png)
-
 Inspired by Mannus AI, this project is a lightweight Research Assistant Demo that automatically opens a browser to collect social media reputation data from platforms like YouTube, Facebook, TikTok, and more.
 It’s designed as a practical tool for marketing, business intelligence, and banking teams who need quick, actionable insights into a company’s online presence.
 
-https://drive.google.com/file/d/1BRtP5aqp5lEIY1eXp8BrHMypFjcq8mVA/view
+[![Xem Demo](ui/public/brand-reputation-check.png)](https://drive.google.com/file/d/1BRtP5aqp5lEIY1eXp8BrHMypFjcq8mVA/view)
+
+<p align="center"><i>(Click on Image to see Video Demo)</i></p>
 
 ## Features
 

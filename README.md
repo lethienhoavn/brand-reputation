@@ -13,7 +13,7 @@ It’s designed as a practical tool for marketing, business intelligence, and ba
 - **Multi-Source Research**: Gathers data from various sources including youtube, tiktok, facebook,...
 - **Competitor Analysis**: Make brand reputation analysis vs. other competitors
 
-Other interesting features thanks to this awesome repo: https://github.com/guy-hartstein/company-research-agent
+Other interesting features thanks to awesome `Company Agent Research` repo (link at the bottom):
 
 - **Real-Time Progress Streaming**: Uses WebSocket connections to stream research progress and results
 - **Modern React Frontend**: Responsive UI with real-time updates, progress tracking, and download options

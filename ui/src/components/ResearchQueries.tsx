@@ -54,7 +54,6 @@ const ResearchQueries: React.FC<ResearchQueriesProps> = ({
                   className="backdrop-filter backdrop-blur-lg bg-white/80 border border-[#468BFF]/30 rounded-lg p-3"
                 >
                   <span className="text-gray-600">{query.text}</span>
-                  <span className="animate-pulse ml-1 text-[#8FBCFA]">|</span>
                 </div>
               ))}
 

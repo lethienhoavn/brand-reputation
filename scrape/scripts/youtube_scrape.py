@@ -3,7 +3,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import time
-import re, os, sys
+import re, os, sys, argparse
 import tempfile
 
 
@@ -159,7 +159,11 @@ def get_recent_videos(driver, channel_url):
 
 
 def main():
-    channel_url = "https://www.youtube.com/@raumamix4106"
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--link')
+    args = parser.parse_args()
+
+    channel_url = args.link
 
     options = uc.ChromeOptions()
     options.add_argument("--start-maximized")

@@ -46,16 +46,16 @@ class BaseResearcher:
             logger.info(f"Generating queries for {company} as {self.analyst_type}")
             
             response = await self.openai_client.chat.completions.create(
-                model="gpt-3.5-turbo",
+                model="gpt-4.1",
                 messages=[
                     {
                         "role": "system",
-                        "content": f"""Find youtube, tiktok, facebook links of {company}.
+                        "content": f"""Find youtube, tiktok, facebook links of brand {company}.
                                     """
                     },
                     {
                         "role": "user",
-                        "content": f"""Find the official YouTube, Facebook, and TikTok links of the company {company}.
+                        "content": f"""Find the official YouTube, Facebook, and TikTok links of the brand {company}.
 {self._format_query_prompt(prompt, company, hq, current_year)}"""
                     }
                 ],
@@ -74,7 +74,8 @@ class BaseResearcher:
                     
                 content = chunk.choices[0].delta.content
                 if content:
-                    content = "Youtube: https://www.youtube.com/@raumamix4106\nTiktok: https://www.tiktok.com/@raumamix.official\nFacebook: https://www.facebook.com/Raumamix"
+                    # TODO
+                    # content = "Youtube: https://www.youtube.com/@raumamix4106\nTiktok: https://www.tiktok.com/@raumamix.official\nFacebook: https://www.facebook.com/Raumamix"
                     current_query += content
                     
                     # Stream the current state to the UI.
@@ -114,7 +115,7 @@ class BaseResearcher:
                                     )
                                 current_query_number += 1
                     
-                    break # TODO: remember to remove
+                    # break # TODO: remember to remove
 
             # Add any remaining query (even if not newline terminated)
             if current_query.strip():
@@ -159,8 +160,6 @@ class BaseResearcher:
     def _format_query_prompt(self, prompt, company, hq, year):
         return f"""{prompt}
                 Strictly follow these instructions:
-                - Visit the official website of {company} first and look for the YouTube, Facebook, and TikTok links there. 
-                - If any link is not listed on the official website, you MAY check reliable sources, but only if you cannot find it on the official website.
                 - Return only links that are confirmed to be active and official. Do not guess.
                 - Output must strictly follow this format:
                 Youtube: [link]

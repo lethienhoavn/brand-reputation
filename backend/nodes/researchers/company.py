@@ -4,13 +4,111 @@ from langchain_core.messages import AIMessage
 
 from ...classes import ResearchState
 from .base import BaseResearcher
-import subprocess, asyncio
+import subprocess, asyncio, os
+import requests
+from urllib.parse import urlparse
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class CompanyAnalyzer(BaseResearcher):
     def __init__(self) -> None:
         super().__init__()
         self.analyst_type = "company_analyzer"
+        self.serp_key = os.getenv("SERP_API_KEY")
+
+    async def find_social_links(self, state: Dict):
+
+        websocket_manager = state.get('websocket_manager')
+        job_id = state.get('job_id')
+        company = state.get('company')
+
+        # Serp API ====================================================
+        params = {
+            "q": "site:facebook.com OR site:youtube.com OR site:tiktok.com " + company,
+            "api_key": self.serp_key,
+            "num": 10 # 10 result
+        }
+
+        response = requests.get("https://serpapi.com/search.json", params=params)
+        results = response.json()
+
+        # Get the right link ===========================================
+        youtube = ""
+        facebook = ""
+        tiktok = ""
+
+        for res in results.get("organic_results", []):
+            link = res["link"]
+            
+            if "youtube.com" in link:
+                # Ưu tiên link channel hoặc @
+                if "/channel/" in link or "/@" or "/c/" in link:
+                    youtube = link
+
+            elif "facebook.com" in link:
+                # Phân tích path
+                p = urlparse(link).path
+                parts = [p.strip("/") for p in p.split("/") if p.strip("/")]
+                # Nếu chỉ có 1 phần sau domain (tức là page chính)
+                if len(parts) == 1:
+                    facebook = link
+
+            elif "tiktok.com" in link:
+                if "/video/" not in link:
+                    tiktok = link
+
+        result = [
+            f"Youtube: {youtube}",
+            f"Facebook: {facebook}",
+            f"Tiktok: {tiktok}"
+        ]
+
+        # Stream result =======================================================
+        try:
+            queries = []
+
+            if result:
+                for query in result:
+                    query = query.strip()
+                    if query:
+                        queries.append(query)
+                        if websocket_manager and job_id:
+                            await websocket_manager.send_status_update(
+                                job_id=job_id,
+                                status="query_generating",
+                                message="Generated new research query",
+                                result={
+                                    "query": query,
+                                    "query_number": len(queries),
+                                    "category": self.analyst_type,
+                                    "is_complete": False
+                                }
+                            )
+            
+            logger.info(f"Generated {len(queries)} queries for {self.analyst_type}: {queries}")
+
+            if not queries:
+                raise ValueError(f"No queries generated for {company}")
+
+            # Limit to at most 3 queries.
+            queries = queries[:3]
+            logger.info(f"Final queries for {self.analyst_type}: {queries}")
+            
+            return queries
+            
+        except Exception as e:
+            logger.error(f"Error generating queries for {company}: {e}")
+            if websocket_manager and job_id:
+                await websocket_manager.send_status_update(
+                    job_id=job_id,
+                    status="error",
+                    message=f"Failed to generate research queries: {str(e)}",
+                    error=f"Query generation failed: {str(e)}"
+                )
+            return []
+        
 
     async def analyze(self, state: ResearchState) -> Dict[str, Any]:
 
@@ -18,13 +116,20 @@ class CompanyAnalyzer(BaseResearcher):
         msg = [f"🏢 Company Analyzer analyzing {company}"]
         
         # Generate search queries using LLM
-        queries = await self.generate_queries(state, "")
+        queries = await self.find_social_links(state)
 
-        queries = [
-            "Youtube: https://www.youtube.com/@raumamix4106",
-            "Tiktok: https://www.tiktok.com/@raumamix.official",
-            "Facebook: https://www.facebook.com/Raumamix"
-        ]
+        # Chuyển sang dict_links
+        dict_links = {}
+        for q in queries:
+            source, link = q.split(":", 1)
+            dict_links[source.strip().lower()] = link.strip()
+
+        # TODO
+        # queries = [
+        #     "Youtube: https://www.youtube.com/@raumamix4106",
+        #     "Tiktok: https://www.tiktok.com/@raumamix.official",
+        #     "Facebook: https://www.facebook.com/Raumamix"
+        # ]
 
         # Add message to show subqueries with emojis
         # subqueries_msg = "🔍 Subqueries for company analysis:\n" + "\n".join([f"• {query}" for query in queries])
@@ -93,7 +198,8 @@ class CompanyAnalyzer(BaseResearcher):
         
         return {
             'message': msg,
-            'company_data': company_data
+            'company_data': company_data,
+            'social_links': dict_links
         }
 
     async def run(self, state: ResearchState) -> Dict[str, Any]:

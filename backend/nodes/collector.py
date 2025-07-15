@@ -4,6 +4,7 @@ from ..classes import ResearchState
 import subprocess, asyncio
 import logging
 from functools import partial
+import shutil, os
 
 logger = logging.getLogger(__name__)
 
@@ -25,28 +26,44 @@ class Collector:
                     result={"step": "Collecting"}
                 )
 
+        # Chuyển sang dict_links
+        dict_links = state['social_links']
+
         # TODO
         try:
-            python_exe = r"D:\H\TCB\brand-reputation\.venv\Scripts\python.exe"
-            base_cwd = r"D:\H\TCB\brand-reputation\scrape"
+            python_exe = r".venv\Scripts\python.exe" # windows
+            base_cwd = r"scrape"
+            data_dir = base_cwd + "/data"
+
+            # Delete old files
+            shutil.rmtree(data_dir)
+            os.makedirs(data_dir)
 
             loop = asyncio.get_running_loop()
 
             # Tạo 3 tasks subprocess chạy song song
-            tasks = [
-                loop.run_in_executor(
-                    None,
-                    partial(subprocess.run, [python_exe, "scripts/youtube_scrape.py"], cwd=base_cwd)
-                ),
-                loop.run_in_executor(
-                    None,
-                    partial(subprocess.run, [python_exe, "scripts/tiktok_scrape.py"], cwd=base_cwd)
-                ),
-                loop.run_in_executor(
-                    None,
-                    partial(subprocess.run, [python_exe, "scripts/fb_scrape.py"], cwd=base_cwd)
-                ),
-            ]
+            tasks = []
+            if 'youtube' in dict_links:
+                tasks.append(
+                    loop.run_in_executor(
+                        None,
+                        partial(subprocess.run, [python_exe, "scripts/youtube_scrape.py", "--link", dict_links['youtube']], cwd=base_cwd)
+                    )
+                )
+            if 'tiktok' in dict_links:
+                tasks.append(
+                    loop.run_in_executor(
+                        None,
+                        partial(subprocess.run, [python_exe, "scripts/tiktok_scrape.py", "--link", dict_links['tiktok']], cwd=base_cwd)
+                    )
+                )
+            if 'facebook' in dict_links:
+                tasks.append(
+                    loop.run_in_executor(
+                        None,
+                        partial(subprocess.run, [python_exe, "scripts/fb_scrape.py", "--link", dict_links['facebook']], cwd=base_cwd)
+                    )
+                )              
 
             # Chờ tất cả xong
             await asyncio.gather(*tasks)

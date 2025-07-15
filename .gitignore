@@ -1,6 +1,7 @@
 # Environment and secrets
 .env
 reports/*
+scrape/cookies/*
 
 # Python
 __pycache__/

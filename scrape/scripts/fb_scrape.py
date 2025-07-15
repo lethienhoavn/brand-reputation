@@ -5,7 +5,7 @@ import time
 import random
 import re, os, sys
 import tempfile
-
+import argparse
 
 def human_scroll(driver, steps=10):
     for _ in range(steps):
@@ -42,6 +42,10 @@ def get_likes_followers(driver):
 
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--link')
+    args = parser.parse_args()
+
     options = uc.ChromeOptions()
     options.add_argument("--start-maximized")
 
@@ -60,7 +64,7 @@ def main():
             cookie.pop('sameSite')
         driver.add_cookie(cookie)
 
-    driver.get("https://www.facebook.com/raumamix/")
+    driver.get(args.link)
     time.sleep(5)
 
     likes, followers = get_likes_followers(driver)

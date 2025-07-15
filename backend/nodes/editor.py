@@ -228,18 +228,22 @@ class Editor:
         company = self.context["company"]
         industry = self.context["industry"]
         hq_location = self.context["hq_location"]
+
+        youtube_link = state['social_links']['youtube']
+        fb_link = state['social_links']['facebook']
+        tiktok_link = state['social_links']['tiktok']
         
         prompt = f"""You are compiling a comprehensive research report about {company}.
 
                     Compiled briefings:
                     {combined_content}
 
-                    Create a comprehensive and focused report on {company} that:
+                    Create a comprehensive and focused report on brand {company} that:
                     1. Integrates information from all sections into a cohesive non-repetitive narrative
                     2. Logically organizes information and uses clear section headers and structure
-                    3. If {company} is raumamix, it means Rau Má Mix, let's find the correct competitors and infos of the company
-                    4. Find some competitors of {company} and look for some general social media stat (num likes, followers,...) to fulfill the report. Only show infos that you're sure
-                    5. Remember to give some introduction about the {company}. Give some infos like: the industry of the company, when it is created, how many stores it has, the owner of the company, some products that it serves,.... Only show infos that you're sure
+                    3. Here are the social media links of brand {company}, Youtube: {youtube_link}, Facebook: {fb_link}, Tiktok: {tiktok_link}. Use this info as context to find the right info of the brand
+                    4. Find some competitors of brand {company} and look for some general social media stat (num likes, followers,...) to fulfill the report. Only show infos that you're sure
+                    5. Remember to give some introduction about the brand {company}. Give some infos like: the industry of the company, when it is created, how many stores it has, the owner of the company, some products that it serves,.... Only show infos that you're sure
                     6. In Social Media & User Engagement section, first give general stats. Then, give table num likes / reaction, table num comments, table num shares,.... of the last 10 videos / posts on 3 platforms Youtube, Tiktok, Facebook. Give explanations & insights, not just raw numbers
 
                     Formatting rules:

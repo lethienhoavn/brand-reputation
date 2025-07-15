@@ -9,11 +9,11 @@ It’s designed as a practical tool for marketing, business intelligence, and ba
 
 ## Features
 
-- **Social Media Links Search**: Automatically find the right social media links
+- **Social Media Links Search**: Automatically find the right social media links with SerpAPI
 - **Multi-Source Research**: Gathers data from various sources including youtube, tiktok, facebook,...
 - **Competitor Analysis**: Make brand reputation analysis vs. other competitors
 
-Other interesting features thanks to awesome `Company Agent Research` repo (link at the bottom):
+Other interesting features included (thanks to this awesome `Company Agent Research` repo, link at the bottom):
 
 - **Real-Time Progress Streaming**: Uses WebSocket connections to stream research progress and results
 - **Modern React Frontend**: Responsive UI with real-time updates, progress tracking, and download options
@@ -117,6 +117,7 @@ Create a `.env` file in the project's root directory and add your backend API ke
 
 ```env
 OPENAI_API_KEY=your_openai_key
+SERP_API_KEY=your_serpapi_key
 
 # Optional: Enable MongoDB persistence
 # MONGODB_URI=your_mongodb_connection_string
